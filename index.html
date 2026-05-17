@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Converter — Convert, Trim, Merge & Extract Audio</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg-dark: #0a1628;
+            --bg-card: #0f1f3a;
+            --text-white: #ffffff;
+            --text-muted: #94a3b8;
+            --text-accent: #a5b4fc;
+            --border-glow: rgba(102, 126, 234, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('Gemini_Generated_Image_2xtg4t2xtg4t2xtg.png') center/cover no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        /* Top bar */
+        .top-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+        }
+
+        /* ===== HERO ===== */
+        header {
+            padding: 60px 0 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(102,126,234,0.08), transparent 70%);
+            top: -200px;
+            right: -150px;
+            pointer-events: none;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(118,75,162,0.06), transparent 70%);
+            bottom: -150px;
+            left: -100px;
+            pointer-events: none;
+        }
+
+        .app-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 28px;
+            margin: 0 auto 28px;
+            display: block;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+            background: white;
+            padding: 4px;
+            border: 2px solid var(--border-glow);
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        h1 .highlight {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 32px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            padding: 16px 36px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.25s;
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.35);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        /* ===== FORMATS ===== */
+        .formats-section {
+            padding: 16px 0 32px;
+            text-align: center;
+        }
+
+        .formats-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+        }
+
+        .formats-label.audio-label { color: #c4b5fd; margin-top: 14px; }
+
+        .formats-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .format-pill {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: var(--text-accent);
+        }
+
+        .format-pill.audio-pill { color: #c4b5fd; }
+
+        /* ===== SCREENSHOTS ===== */
+        .screenshots {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        .gallery-scroll {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 8px 0 20px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .gallery-scroll::-webkit-scrollbar { height: 6px; }
+        .gallery-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+        .gallery-scroll::-webkit-scrollbar-track { background: transparent; }
+
+        .screenshot-item {
+            flex: 0 0 auto;
+            height: 440px;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.08);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            scroll-snap-align: start;
+            transition: transform 0.25s;
+        }
+
+        .screenshot-item:hover { transform: scale(1.04); }
+
+        /* ===== FEATURES ===== */
+        .features {
+            padding: 60px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon { font-size: 2rem; margin-bottom: 16px; display: block; }
+        .feature-card h3 { font-size: 1.15rem; margin-bottom: 10px; }
+        .feature-card p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* ===== TECH / WHY CHOOSE ===== */
+        .tech-section {
+            padding: 60px 0;
+        }
+
+        .tech-box {
+            background: linear-gradient(135deg, #0f1f3a, #151a3a);
+            border: 1px solid var(--border-glow);
+            border-radius: 28px;
+            padding: 50px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .tech-box h2 { font-size: 1.8rem; margin-bottom: 12px; }
+        .tech-box > div > p { color: var(--text-muted); margin-bottom: 24px; }
+
+        .tech-list { list-style: none; }
+        .tech-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 1rem;
+        }
+
+        .tech-list li::before {
+            content: "✦";
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .side-icon {
+            text-align: center;
+        }
+
+        .side-icon img {
+            width: 160px;
+            height: 160px;
+            border-radius: 36px;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+            border: 2px solid var(--border-glow);
+            background: white;
+            padding: 4px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .side-icon img:hover { transform: scale(2); }
+
+        /* ===== DOWNLOAD ===== */
+        .download-section {
+            text-align: center;
+            padding: 50px 0;
+        }
+
+        .download-section h2 { font-size: 1.6rem; margin-bottom: 10px; }
+        .download-section p { color: var(--text-muted); margin-bottom: 24px; }
+
+        .google-play-badge {
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .google-play-badge:hover { transform: scale(1.05); }
+        .google-play-badge img { height: 60px; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 24px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+
+        .footer-nav { margin-bottom: 12px; }
+        .footer-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 14px;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-nav a:hover { color: var(--text-accent); }
+        footer p { color: rgba(255,255,255,0.3); font-size: 0.8rem; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header { padding: 40px 0 24px; }
+            .tech-box { grid-template-columns: 1fr; text-align: center; padding: 32px 24px; }
+            .tech-list li { justify-content: center; }
+            .side-icon img { width: 120px; height: 120px; }
+            .side-icon img:hover { transform: scale(1.5); }
+            .screenshot-item { height: 360px; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- ===== HERO ===== -->
+<header>
+    <div class="container">
+        <img src="icon.png" alt="Video Converter" class="app-logo">
+
+        <h1>Convert, Trim, Merge <span class="highlight">Video</span><br>
+            <span class="highlight">& Extract Audio</span></h1>
+
+        <p class="hero-subtitle">
+            Powerful yet simple video converter — fully offline. Batch processing, background mode, and full control over quality.
+        </p>
+
+        <a href="https://play.google.com/store/apps/details?id=com.aigrator.videoconverter" class="cta-button">
+            Download on Google Play
+        </a>
+
+        <!-- Formats -->
+        <div class="formats-section">
+            <div class="formats-label">Video Formats</div>
+            <div class="formats-row">
+                <span class="format-pill">MP4</span>
+                <span class="format-pill">MKV</span>
+                <span class="format-pill">WEBM</span>
+                <span class="format-pill">AVI</span>
+                <span class="format-pill">MOV</span>
+                <span class="format-pill">3GP</span>
+                <span class="format-pill">F4V</span>
+                <span class="format-pill">FLV</span>
+                <span class="format-pill">M4V</span>
+                <span class="format-pill">MPEG</span>
+                <span class="format-pill">MPG</span>
+                <span class="format-pill">MTS</span>
+                <span class="format-pill">TS</span>
+                <span class="format-pill">VOB</span>
+                <span class="format-pill">WMV</span>
+            </div>
+
+            <div class="formats-label audio-label">Audio Formats</div>
+            <div class="formats-row">
+                <span class="format-pill audio-pill">MP3</span>
+                <span class="format-pill audio-pill">AAC</span>
+                <span class="format-pill audio-pill">WAV</span>
+                <span class="format-pill audio-pill">FLAC</span>
+                <span class="format-pill audio-pill">OGG</span>
+                <span class="format-pill audio-pill">AC3</span>
+                <span class="format-pill audio-pill">M4A</span>
+                <span class="format-pill audio-pill">AMR</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ===== SCREENSHOTS ===== -->
+<section class="screenshots container">
+    <h2 class="section-title">See It in Action</h2>
+    <p class="section-sub">Simple, clean interface designed for speed</p>
+    <div class="gallery-scroll">
+                <img src="1.jpg" alt="Home Screen" class="screenshot-item">
+                <img src="2.jpg" alt="Format Select" class="screenshot-item">
+                <img src="3.jpg" alt="Trim Preview" class="screenshot-item">
+                <img src="4.jpg" alt="Merge Videos" class="screenshot-item">
+                <img src="5.jpg" alt="Audio Extract" class="screenshot-item">
+                <img src="6.jpg" alt="Batch Queue" class="screenshot-item">
+                <img src="7.jpg" alt="Settings" class="screenshot-item">
+                <img src="8.jpg" alt="File Manager" class="screenshot-item">
+                <img src="9.jpg" alt="Conversion" class="screenshot-item">
+                <img src="10.jpg" alt="Gallery" class="screenshot-item">
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features container">
+    <h2 class="section-title">Everything You Need</h2>
+    <p class="section-sub">From quick conversions to full batch pipelines</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon">🔄</span>
+            <h3>Convert Any Format</h3>
+            <p>18+ video and 8+ audio formats supported. MP4, MKV, AVI, MOV, WEBM and more.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">✂️</span>
+            <h3>Trim Videos</h3>
+            <p>Cut unwanted segments with a visual preview. Set exact start and end points.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">📼</span>
+            <h3>Merge Clips</h3>
+            <p>Combine multiple videos into one file. Perfect for stitching recordings together.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🎵</span>
+            <h3>Extract Audio</h3>
+            <p>Pull audio from any video and save as MP3, AAC, WAV, FLAC, OGG and more.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">📦</span>
+            <h3>Batch Convert</h3>
+            <p>Process hundreds of files at once. Set it and let it run — with background mode support.</p>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">⚙️</span>
+            <h3>Full Control</h3>
+            <p>Adjust resolution, bitrate, frame rate, codec, and quality. Hardware acceleration included.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHY CHOOSE ===== -->
+<section class="tech-section container">
+    <div class="tech-box">
+        <div>
+            <h2>Why Choose Video Converter?</h2>
+            <p>Private, offline, and packed with professional features.</p>
+            <ul class="tech-list">
+                <li>100% offline — no internet required</li>
+                <li>No watermark on your files</li>
+                <li>Multi-threaded conversion for speed</li>
+                <li>Background processing while you multitask</li>
+                <li>Regular updates and new features</li>
+                <li>Simple interface, powerful engine</li>
+            </ul>
+        </div>
+        <div class="side-icon">
+            <img src="icon.png" alt="Video Converter Icon">
+        </div>
+    </div>
+</section>
+
+<!-- ===== DOWNLOAD ===== -->
+<section class="download-section container">
+    <h2>Get Started Now</h2>
+    <p>Join thousands of users who trust Video Converter for their daily tasks.</p>
+    <a href="https://play.google.com/store/apps/details?id=com.aigrator.videoconverter" class="google-play-badge">
+        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play">
+    </a>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="container">
+        <nav class="footer-nav">
+            <a href="mailto:aigrator@gmail.com">Support</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+        </nav>
+        <p>&copy; 2026 Aigrator. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>
